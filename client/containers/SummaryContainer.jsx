@@ -21,7 +21,6 @@ const SummaryContainer = (props) => {
     fetch('/skills/')
       .then(res => res.json())
       .then(data => {
-        console.log(data)
         props.populateSkills(data);
       })
       .catch(err => console.log(err));
@@ -33,7 +32,7 @@ const SummaryContainer = (props) => {
   }
 
   return (
-    <div>
+    <div  className='skillsContainer'>
       {skills}
     </div>
   );

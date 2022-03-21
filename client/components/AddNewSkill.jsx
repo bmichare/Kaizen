@@ -1,28 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { testAction } from '../actions/actionCreators';
+import { testAction, populateSkills } from '../actions/actionCreators';
 
 const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-  testAction,
+  testAction, populateSkills,
 };
 
-// const mapDispatchToProps = (dispatch) => ({
-//   testAction: () => dispatch(testAction()),
-// });
-
+//Interface to add a new skill. Requires new skill input to not be null, optional inputs of goal hours & description. 
+//Sends this info to back-end. Gets back updated list of skills from back-end. Updates skills state by calling populateSkills. 
 const AddNewSkill = (props) => {
   function handleSubmit(e) {
-    const newData = {}
+    const newData = {};
     const formData = new FormData(e.currentTarget);
     e.preventDefault();
-    // console.log(newData)
-    for (const [key, value] of formData.entries()) newData[key] = value
-    // console.log(newData)
-    // props.testAction();
+    for (const [key, value] of formData.entries()) newData[key] = value;
     fetch('/skills/', {
       method: 'POST',
       headers: {
@@ -30,16 +25,11 @@ const AddNewSkill = (props) => {
       },
       body: JSON.stringify({...newData}),
     })
-      // .then(res => res.json())
-      // .then(data => {
-      //   console.log(data)
-      //   // props.populateSkills(data);
-      // })
-      // fetch('/skills/')
       .then(res => res.json())
       .then(data => {
-        console.log(data)
-        // props.populateSkills(data);
+        //Check if there was an error in creating the new skill
+        if(data.err) return alert(data.err);
+        else props.populateSkills(data);
       })
       .catch(err => console.log(err));
   }

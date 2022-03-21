@@ -1,2 +1,4 @@
 export const POPULATE_SKILLS = 'POPULATE_SKILLS';
 export const TEST = 'TEST';
+export const DELETE_SKILL = 'DELETE_SKILL';
+export const ACTIVATE_ADD_LOG_DETAILS = 'ACTIVATE_ADD_LOG_DETAILS';
