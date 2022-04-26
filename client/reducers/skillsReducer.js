@@ -18,7 +18,7 @@ const reducer = (state = initialState, action) => {
 
   //Populates skills in state with the result from GET request to retrieve stored skills
   case types.POPULATE_SKILLS:
-    newState.skills = action.payload;
+    newState.skills = action.payload.skills;
     return newState;
 
   case types.DELETE_SKILL:
@@ -27,6 +27,7 @@ const reducer = (state = initialState, action) => {
 
   //Toggles whether or not the addLogDetails component should show. 
   case types.ACTIVATE_ADD_LOG_DETAILS:
+    console.log(action.payload)
     if(!newState.activeAddLogDetails[action.payload]) newState.activeAddLogDetails[action.payload] = true;
     else delete newState.activeAddLogDetails[action.payload];
     return newState;

@@ -3,10 +3,13 @@ const path = require('path');
 
 module.exports = {
   mode: process.env.NODE_ENV,
-  entry: './client/index',
+  entry: {
+    app: './client/index',
+    background: './background.js'
+  },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'build'),
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, './extension'),
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -39,4 +42,5 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({ template: './client/index.html' }),
   ],
+  devtool: 'cheap-module-source-map',
 };

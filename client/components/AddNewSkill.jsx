@@ -28,8 +28,10 @@ const AddNewSkill = (props) => {
       .then(res => res.json())
       .then(data => {
         //Check if there was an error in creating the new skill
+        console.log(data)
         if(data.err) return alert(data.err);
         else props.populateSkills(data);
+        e.target.reset();
       })
       .catch(err => console.log(err));
   }
@@ -40,6 +42,7 @@ const AddNewSkill = (props) => {
       <form onSubmit={(e) => handleSubmit(e)}>
         <input name='skillName' placeholder='new skill' />
         <input name='goalHrs' placeholder='optional goal hours' />
+        <input name='group' placeholder='optional group' />
         <textarea name='description' placeholder='optional description'/>
         <input type='submit' value='submit' />
       </form>

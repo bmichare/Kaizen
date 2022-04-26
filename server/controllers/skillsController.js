@@ -1,14 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const dataPath = path.resolve(__dirname, '../../data/skills.json');
+const skillsPath = path.resolve(__dirname, '../../data/skills.json');
+const logsPath = path.resolve(__dirname, '../../data/logs.json');
 const skillsController = {};
 
 //DATA FORMAT: {skillName: {skillName, goalHrs, description, logs: [{date, log desc, log title}] }}
 
 //receive data in string form, pass it onto front-end in JSON form
 skillsController.getSkills = (req, res, next) => {
-  fs.readFile(dataPath, 'UTF-8', (err, data) => {
+  fs.readFile(skillsPath, 'UTF-8', (err, data) => {
     if(err) return next({
       log: `error in skillsController.getSkills ${err}`,
       message: { err: 'error in skillsController.getSkills' },
@@ -21,17 +22,17 @@ skillsController.getSkills = (req, res, next) => {
 
 //creates new skill by first reading in that data from data folder
 skillsController.createSkill = (req, res, next) => {
-  fs.readFile(dataPath, 'UTF-8', (err, data) => {
+  fs.readFile(skillsPath, 'UTF-8', (err, data) => {
     if(err) return next({
       log: `error in skillsController.getSkills ${err}`,
       message: { err: 'error in skillsController.getSkills' },
     });
 
     data = JSON.parse(data);
-    const { skillName, goalHrs, description } = req.body;
+    const { skillName, goalHrs, description, group } = req.body;
 
     //ensure skill isn't a duplicate
-    if(data[skillName]) return next({
+    if(data.skills[skillName]) return next({
       log: 'error in skillsController.createSkill: skill already exists',
       message: {err: 'Error: This skill already exists'},
     });
@@ -44,9 +45,9 @@ skillsController.createSkill = (req, res, next) => {
 
     //Add new skill & info to data object. Write updated data to database. 
     //Sends data for the updated list of skills to front-end
-    data[skillName] = { skillName, goalHrs, description, totalMinutes: 0, logs: [] };
+    data.skills[skillName] = { skillName, goalHrs, description, totalMinutes: 0, group};
 
-    fs.writeFile(dataPath, JSON.stringify(data), (err) => {
+    fs.writeFile(skillsPath, JSON.stringify(data), (err) => {
       if(err) return next({
         log: `error in skillsController.createSkill ${err}`,
         message: { err: 'error in skillsController.createSkill' },
@@ -60,18 +61,39 @@ skillsController.createSkill = (req, res, next) => {
 
 //Receives skillName as a param. Deletes skill from database using skillName as identifier
 //Sends back the deleted skill 
+//Also delete the relevant logs from logsDB
 skillsController.deleteSkill = (req, res, next) => {
-  fs.readFile(dataPath, 'UTF-8', (err, data) => {
+  const { skillName } = req.params;
+  fs.readFile(skillsPath, 'UTF-8', (err, data) => {
     if(err) return next({
       log: `error in skillsController.deleteSkill ${err}`,
       message: { err: 'Error when attemping to delete.' },
     });
 
     data = JSON.parse(data);
-    res.locals.deletedSkill = data[req.params.skillName];
-    delete data[req.params.skillName];
+    res.locals.deletedSkill = data.skills[skillName];
+    delete data.skills[skillName];
 
-    fs.writeFile(dataPath, JSON.stringify(data), (err, data) => {
+    fs.writeFile(skillsPath, JSON.stringify(data), (err) => {
+      if(err) return next({
+        log: `error in skillsController.deleteSkill ${err}`,
+        message: { err: 'Error when attemping to delete.' },
+      });
+    });
+  });
+
+  fs.readFile(logsPath, 'UTF-8', (err, logsDB) => {
+    if(err) return next({
+      log: `error in skillsController.deleteSkill ${err}`,
+      message: { err: 'Error when attemping to delete.' },
+    });
+
+    logsDB = JSON.parse(logsDB);
+    console.log(logsDB)
+    delete logsDB[skillName];
+    console.log(logsDB)
+    
+    fs.writeFile(logsPath, JSON.stringify(logsDB), (err) => {
       if(err) return next({
         log: `error in skillsController.deleteSkill ${err}`,
         message: { err: 'Error when attemping to delete.' },
@@ -82,39 +104,51 @@ skillsController.deleteSkill = (req, res, next) => {
   });
 };
 
-//Receives new log data and writes it to db. 
-skillsController.postLog = (req, res, next) => {
+//Updates total minutes within skills file
+skillsController.updateTotalMinutes = (req, res, next) => {
   const { date, hours, minutes, notes, skillName } = req.body;
   const newLog = { date, hours, minutes, notes }
-
-  //If hours & minutes are both 0, return error to front-end
-  if(hours == 0 && minutes == 0) return next({
-    log: 'error in skillsController.postLog: both hours and minutes cannot be zero',
-    message: { err: 'Both hours and minutes cannot be zero.' },
-  }); 
-
-  //Take current data file and push the new log to the proper skill's log array
-  fs.readFile(dataPath, 'UTF-8', (err, data) => {
+  fs.readFile(skillsPath, 'UTF-8', (err, data) => {
     if(err) return next({
       log: `error in skillsController.postLog ${err}`,
       message: { err: 'Error when attemping to post Log.' },
     });
 
     data = JSON.parse(data);
-    data[skillName].logs.push(newLog);
 
     //Convert hours and minutes to minutes only. Add this number to totalMinutes practiced
-    const minutesPracticed = hours * 60 + minutes;
-    data[skillName].totalMinutes += minutesPracticed;
-    console.log(data[skillName])
-    fs.writeFile(dataPath, JSON.stringify(data), (err, data) => {
+    data.skills[skillName].totalMinutes += (hours * 60 + minutes);
+
+    fs.writeFile(skillsPath, JSON.stringify(data), (err) => {
       if(err) return next({
         log: `error in skillsController.postLog ${err}`,
         message: { err: 'Error when attemping to post log.' },
       });
 
-      res.locals.postedLog = newLog;
-      
+      res.locals.newSkills = data;
+      return next();
+    });
+  });
+};
+
+//Updates the group for the proper skill
+skillsController.changeGroup = (req, res, next) => {
+  fs.readFile(skillsPath, 'UTF-8', (err, skillsData) => {
+    if(err) return next({
+      log: `error in skillsController.postLog ${err}`,
+      message: { err: 'Error when attemping to post Log.' },
+    });
+
+    skillsData = JSON.parse(skillsData);
+    skillsData.skills[req.body.skillName].group = req.body.newGroup;
+
+    fs.writeFile(skillsPath, JSON.stringify(skillsData), (err) => {
+      if(err) return next({
+        log: `error in skillsController.postLog ${err}`,
+        message: { err: 'Error when attemping to post log.' },
+      });
+
+      res.locals.skillsWithUpdatedGroup = skillsData;
       return next();
     });
   });

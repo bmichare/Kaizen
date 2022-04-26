@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 
 const skillsRouter = require('./routers/skillsRouter');
+const groupsRouter = require('./routers/groupsRouter');
 
 const app = express();
 const PORT = 3000;
@@ -10,9 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/skills', skillsRouter);
+app.use('/groups', groupsRouter);
 
 //global error handler
-
 app.use((err, req, res, next) => {
   const defaultErr = {
     log: 'Express error handler caught unknown middleware error',

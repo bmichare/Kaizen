@@ -5,8 +5,8 @@
   "main": "webpack.config.js",
   "scripts": {
     "start": "nodemon node server/server.js",
-    "build": "cross-env NODE_ENV=development webpack",
-    "dev": "cross-env NODE_ENV=development concurrently  \"nodemon ./server/server.js\" \"webpack-dev-server --open\"",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Benjamin Michareune",
