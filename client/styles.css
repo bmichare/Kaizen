@@ -1,0 +1,112 @@
+html {
+  /* background: linear-gradient(blue grey); */
+  background: linear-gradient(wheat, #252741);
+  max-width: 600px;
+}
+
+.GroupComponent {
+  /* background-color:wheat; */
+  position: relative;
+  /* border: solid 2px green; */
+  border-bottom: 1px;
+  padding-bottom: 20px;
+}
+
+.GroupComponentHeader {
+  display: grid;
+  grid-template-columns: 30% 66% 4%;
+  align-items: flex-end;
+  padding-bottom: 6px;
+  border: solid 3px green;
+  background-color: burlywood;
+  /* flex-direction: column; */
+  /* justify-content: space-between; */
+  /* align-items: center; */
+}
+
+.GroupComponentHeader > button {
+ background-color: whitesmoke;
+ border-radius: 50%;
+ position: absolute;
+ top: 1px;
+ right: 2px;
+}
+
+#groupName {
+  font-size: larger;
+  font-weight: bold;
+  padding-left: 5%;
+}
+
+.SkillComponent {
+  /* border:solid 2px rgb(71, 182, 71); */
+  /* border-bottom: solid 1px green; */
+  background: linear-gradient(silver, beige);
+  padding-top: 1%;
+  padding-bottom: 1%;
+  padding-left: 1%;
+  padding-right: 1%;
+  opacity: 20;
+  margin-left: 1%;
+}
+
+.SkillComponent .skillsContainer {
+  /* border-top: solid 2px silver;
+  border-left: solid 2px silver;
+  border-right: solid 2px silver; */
+  /* background: linear-gradient(#8386f5, #8d4af8); */
+  padding-top: 1%;
+  padding-bottom: 1%;
+  padding-left: 1%;
+  opacity: 20;
+  display: grid;
+  grid-template-columns: 20% 70% 10%; 
+  align-items: center;
+}
+
+#skillName {
+  font-size: large;
+}
+
+.SkillComponent button {
+  /* border-radius: 70%; */
+  /* width: 25px; */
+  /* right: 0 */
+}
+
+.skillDetailsComponent {
+  margin-left: 10px;
+ padding-bottom: 10px;
+}
+
+#viewSkillDetailsButton {
+}
+
+.LogComponent {
+  display: flex;
+  /* justify-content: flex-start; */
+  /* align-items: flex-start; */
+}
+
+.LogComponent > button {
+  width: 20px;
+  margin-right: 10;
+  justify-content: center;
+  margin-left: 5%;
+  display: grid;
+}
+
+.AddLogDetailsComponent {
+  /* background-color: red; */
+  display: grid;
+  grid-template-columns: 30% 50% 20%; 
+}
+
+
+/* label{
+  display:inline-block;
+  width:200px;
+  margin-right:30px;
+  text-align:right;
+} */
+  
